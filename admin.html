@@ -1,441 +1,891 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - TecnoServicios</title>
-    
-    <style>
-        /* --- VARIABLES BASE --- */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        
-        :root {
-            --bg-color: #f5f5f7; 
-            --text-main: #1d1d1f; 
-            --text-muted: #86868b; 
-            --font-stack: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --accent-blue: #0071e3;
-            --accent-blue-hover: #0077ed;
-            --danger: #ff3b30;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TecnoServicios — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Archivo:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:      #0d0d0d;
+  --paper:    #f7f4ef;
+  --cream:    #ede9e0;
+  --stroke:   #d6d0c4;
+  --ghost:    #9e9889;
+  --red:      #c0392b;
+  --red-soft: #f9edeb;
+  --blue:     #1a3a5c;
+  --blue-soft:#e8eef5;
+  --green:    #1a5c3a;
+  --green-soft:#e8f5ee;
+  --gold:     #8a6a1f;
+  --f-display:'Playfair Display', Georgia, serif;
+  --f-body:   'Archivo', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
-        body {
-            font-family: var(--font-stack);
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            -webkit-font-smoothing: antialiased;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+body {
+  font-family: var(--f-body);
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
 
-        /* --- MENÚ SUPERIOR --- */
-        nav {
-            position: fixed; top: 0; width: 100%; height: 48px;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
-            display: flex; align-items: center; justify-content: center; z-index: 1000;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        .nav-container {
-            width: 100%; max-width: 1024px; padding: 0 22px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .nav-links { display: flex; gap: 32px; list-style: none; }
-        .nav-links a {
-            color: var(--text-main); text-decoration: none; font-size: 12px;
-            opacity: 0.6; font-weight: 400; transition: opacity 0.2s ease;
-        }
-        .nav-links a:hover, .nav-links a.active { opacity: 1; font-weight: 600; }
-        .nav-logo { font-weight: 600; font-size: 14px; text-decoration: none; color: var(--text-main); transition: opacity 0.2s; }
-        .nav-logo:hover { opacity: 0.7; }
 
-        /* --- CABECERA --- */
-        .page-header { padding: 100px 20px 40px; text-align: center; }
-        .page-header h1 {
-            font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 800;
-            letter-spacing: -1.2px; color: var(--text-main); margin-bottom: 10px;
-        }
-        .page-header p {
-            font-size: 1.1rem; color: var(--text-muted); max-width: 600px; margin: 0 auto;
-        }
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  pointer-events:none;
+}
 
-        /* --- CONTENEDORES ADMIN --- */
-        .admin-layout {
-            max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; width: 100%;
-            display: grid; grid-template-columns: 1fr 2fr; gap: 40px;
-        }
 
-        @media (max-width: 900px) {
-            .admin-layout { grid-template-columns: 1fr; }
-        }
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:200;
+  height: 60px;
+  background: rgba(247,244,239,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--stroke);
+  display: flex; align-items: center;
+}
+.nav-inner {
+  width:100%; max-width:1440px; margin:0 auto;
+  padding: 0 40px;
+  display: flex; align-items:center; justify-content:space-between;
+}
+.nav-wordmark {
+  display:flex; align-items:center; gap:12px;
+  text-decoration:none; color:var(--ink);
+}
+.nav-wordmark svg { color: var(--gold); }
+.wordmark-text {
+  font-family: var(--f-display);
+  font-size: 1.1rem; font-weight:700; letter-spacing:-0.02em;
+}
+.nav-right { display:flex; align-items:center; gap:20px; }
+.nav-tag {
+  font-size:0.7rem; font-weight:600; letter-spacing:0.14em;
+  text-transform:uppercase; color:var(--ghost);
+}
+.status-pill {
+  display:flex; align-items:center; gap:6px;
+  font-size:0.72rem; font-weight:500; color:var(--green);
+  background:var(--green-soft);
+  border:1px solid rgba(26,92,58,0.18);
+  padding:5px 12px; border-radius:100px;
+}
+.status-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 0 3px rgba(26,92,58,0.2);
+  animation: pulse 2.4s ease infinite;
+}
+@keyframes pulse {
+  0%,100%{box-shadow:0 0 0 3px rgba(26,92,58,0.2)}
+  50%{box-shadow:0 0 0 6px rgba(26,92,58,0.06)}
+}
 
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-            border-radius: 32px; padding: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255,255,255,1);
-            height: fit-content;
-        }
 
-        .panel-title {
-            font-size: 1.4rem; font-weight: 700; margin-bottom: 24px;
-            letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px;
-        }
+.page {
+  position:relative; z-index:1;
+  padding-top: 60px;
+  min-height:100vh;
+  display:flex; flex-direction:column;
+}
 
-        /* --- FORMULARIOS DINÁMICOS --- */
-        .form-group { margin-bottom: 20px; }
-        .form-group label {
-            display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);
-            margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;
-        }
-        .form-control {
-            width: 100%; padding: 14px 18px; border-radius: 16px;
-            border: 1px solid rgba(0,0,0,0.08);
-            background: rgba(255, 255, 255, 0.5);
-            font-family: var(--font-stack); font-size: 1rem; color: var(--text-main);
-            transition: all 0.3s ease; outline: none;
-        }
-        .form-control:focus {
-            background: rgba(255, 255, 255, 0.9);
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
-        }
 
-        /* Ocultar secciones dinámicas por defecto */
-        .dynamic-section {
-            display: none;
-            background: rgba(0,0,0,0.02);
-            padding: 20px; border-radius: 20px; margin-bottom: 20px;
-            border: 1px dashed rgba(0,0,0,0.1);
-        }
-        .dynamic-section.active { display: block; animation: fadeIn 0.4s ease; }
+.masthead {
+  border-bottom: 1px solid var(--stroke);
+  padding: 52px 40px 36px;
+  max-width:1440px; width:100%; margin:0 auto;
+  display:grid; grid-template-columns:1fr auto;
+  align-items:end; gap:32px;
+}
+@media(max-width:700px){ .masthead{grid-template-columns:1fr; padding:40px 20px 28px;} }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+.masthead-left {}
+.masthead-eyebrow {
+  font-size:0.7rem; font-weight:600; letter-spacing:0.16em;
+  text-transform:uppercase; color:var(--ghost);
+  margin-bottom:10px;
+  display:flex; align-items:center; gap:8px;
+}
+.masthead-eyebrow::before {
+  content:''; display:block;
+  width:24px; height:1px; background:var(--ghost);
+}
+.masthead-title {
+  font-family:var(--f-display);
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight:900; letter-spacing:-2px; line-height:0.95;
+  color:var(--ink);
+}
+.masthead-title em {
+  font-style:italic; color:var(--gold);
+}
 
-        .btn-submit {
-            background: var(--text-main); color: #fff; border: none;
-            width: 100%; padding: 16px; border-radius: 20px; font-size: 1rem; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
-        }
-        .btn-submit:hover { background: var(--accent-blue); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,113,227,0.2); }
+.stats-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:0;
+  border:1px solid var(--stroke); border-radius:16px;
+  overflow:hidden; background:white;
+}
+@media(max-width:700px){ .stats-grid{grid-template-columns:repeat(2,1fr);} }
+.stat-cell {
+  padding:16px 22px;
+  border-right:1px solid var(--stroke);
+  position:relative;
+}
+.stat-cell:last-child { border-right:none; }
+.stat-num {
+  font-family:var(--f-display);
+  font-size:2rem; font-weight:900; letter-spacing:-1px;
+  color:var(--ink); line-height:1;
+}
+.stat-num.gold { color:var(--gold); }
+.stat-label {
+  font-size:0.68rem; font-weight:600; letter-spacing:0.1em;
+  text-transform:uppercase; color:var(--ghost);
+  margin-top:4px;
+}
 
-        /* --- LISTA DE PRODUCTOS --- */
-        .product-list-item {
-            background: rgba(255, 255, 255, 0.5); border-radius: 20px;
-            padding: 20px; margin-bottom: 16px; border: 1px solid rgba(0,0,0,0.03);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .item-info h4 { font-size: 1.1rem; margin-bottom: 4px; }
-        .item-info p { font-size: 0.85rem; color: var(--text-muted); }
-        .item-badge {
-            display: inline-block; padding: 4px 10px; background: #f0f0f5;
-            border-radius: 10px; font-size: 0.7rem; font-weight: 600; color: var(--text-main); margin-top: 6px;
-        }
-        .btn-delete {
-            background: #fdf2f1; color: var(--danger); border: none;
-            width: 40px; height: 40px; border-radius: 20px; cursor: pointer;
-        }
 
-        footer { text-align: center; padding: 40px; color: var(--text-muted); font-size: 12px; margin-top: auto; }
-    </style>
+.workspace {
+  max-width:1440px; width:100%; margin:0 auto;
+  padding: 36px 40px 80px;
+  display:grid; grid-template-columns:380px 1fr;
+  gap:28px; align-items:start; flex:1;
+}
+@media(max-width:1100px){ .workspace{grid-template-columns:1fr; padding:24px 20px 60px;} }
+
+/* ─── PANEL ─── */
+.panel {
+  background:white;
+  border:1px solid var(--stroke);
+  border-radius:20px;
+  overflow:hidden;
+}
+.panel-head {
+  padding:22px 28px 18px;
+  border-bottom:1px solid var(--stroke);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.panel-heading {
+  font-family:var(--f-display);
+  font-size:1.05rem; font-weight:700; letter-spacing:-0.02em;
+  display:flex; align-items:center; gap:10px;
+}
+.panel-heading svg { color:var(--gold); }
+.panel-body { padding:28px; }
+
+
+.fg { margin-bottom:18px; }
+.fg:last-of-type { margin-bottom:0; }
+.fg label {
+  display:block;
+  font-size:0.68rem; font-weight:600; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--ghost);
+  margin-bottom:7px;
+}
+.fc {
+  width:100%;
+  background:#fafaf8;
+  border:1px solid var(--stroke);
+  border-radius:10px;
+  padding:12px 15px;
+  font-family:var(--f-body); font-size:0.92rem; color:var(--ink);
+  outline:none; transition:border-color .2s, box-shadow .2s;
+  appearance:none;
+}
+.fc::placeholder { color:var(--ghost); }
+.fc:focus {
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(138,106,31,0.12);
+  background:white;
+}
+.fc option { background:white; }
+
+
+.file-zone {
+  border:1.5px dashed var(--stroke);
+  border-radius:12px; padding:24px 16px;
+  text-align:center; cursor:pointer;
+  transition:border-color .2s, background .2s;
+  position:relative; background:#fafaf8;
+}
+.file-zone:hover, .file-zone.filled {
+  border-color:var(--gold); background:rgba(138,106,31,0.03);
+}
+.file-zone input[type=file] {
+  position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;
+}
+.fz-icon { color:var(--ghost); margin-bottom:8px; display:flex; justify-content:center; }
+.fz-text { font-size:0.8rem; color:var(--ghost); }
+.fz-name { font-size:0.8rem; font-weight:600; color:var(--gold); margin-top:5px; }
+
+
+.dyn {
+  display:none;
+  background:#fafaf8;
+  border:1px dashed var(--stroke);
+  border-radius:12px; padding:18px;
+  margin-bottom:18px;
+  animation:fadeUp .3s ease;
+}
+.dyn.on { display:block; }
+@keyframes fadeUp{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.dyn-tag {
+  font-size:0.65rem; font-weight:700; letter-spacing:0.14em;
+  text-transform:uppercase; color:var(--gold);
+  margin-bottom:14px; display:flex; align-items:center; gap:7px;
+}
+.dyn-tag svg { color:var(--gold); }
+
+
+.progress-wrap { height:2px; background:var(--cream); margin-bottom:16px; display:none; border-radius:2px; overflow:hidden; }
+.progress-wrap.on { display:block; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--gold),#d4a84b); width:0%; transition:width .4s; }
+
+
+.btn-publish {
+  width:100%; padding:14px;
+  background:var(--ink); color:white;
+  border:none; border-radius:12px;
+  font-family:var(--f-body); font-size:0.88rem; font-weight:600;
+  letter-spacing:0.04em; cursor:pointer;
+  transition:all .25s ease; margin-top:8px;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+}
+.btn-publish:hover {
+  background:var(--blue);
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(26,58,92,0.2);
+}
+.btn-publish:disabled { opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+.btn-publish svg { flex-shrink:0; }
+
+
+.inv-controls {
+  padding:16px 24px;
+  border-bottom:1px solid var(--stroke);
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+}
+.search-wrap { flex:1; min-width:160px; position:relative; }
+.search-wrap svg { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--ghost); pointer-events:none; }
+.search-in {
+  width:100%;
+  background:#fafaf8; border:1px solid var(--stroke);
+  border-radius:9px; padding:9px 13px 9px 34px;
+  font-family:var(--f-body); font-size:0.84rem; color:var(--ink);
+  outline:none; transition:border-color .2s;
+}
+.search-in:focus { border-color:var(--gold); }
+.search-in::placeholder { color:var(--ghost); }
+
+.flt {
+  background:#fafaf8; border:1px solid var(--stroke);
+  border-radius:9px; padding:8px 14px;
+  font-family:var(--f-body); font-size:0.76rem; font-weight:600;
+  letter-spacing:0.04em; color:var(--ghost);
+  cursor:pointer; transition:all .2s; white-space:nowrap;
+  display:flex; align-items:center; gap:6px;
+}
+.flt:hover, .flt.on {
+  border-color:var(--gold); color:var(--gold);
+  background:rgba(138,106,31,0.05);
+}
+.flt svg { flex-shrink:0; }
+
+.count-chip {
+  background:var(--cream); color:var(--ghost);
+  border-radius:100px; padding:2px 10px;
+  font-size:0.7rem; font-weight:600;
+}
+.count-chip.filled { background:rgba(138,106,31,0.1); color:var(--gold); }
+
+.inv-list { padding:18px 24px; max-height:680px; overflow-y:auto; }
+.inv-list::-webkit-scrollbar { width:3px; }
+.inv-list::-webkit-scrollbar-thumb { background:var(--stroke); border-radius:2px; }
+
+/* ─── PRODUCT CARD ─── */
+.pcard {
+  background:white; border:1px solid var(--stroke);
+  border-radius:14px; padding:14px 16px;
+  margin-bottom:10px;
+  display:grid; grid-template-columns:56px 1fr auto;
+  gap:14px; align-items:center;
+  transition:border-color .2s, box-shadow .2s;
+  animation:fadeUp .3s ease both;
+}
+.pcard:hover {
+  border-color:rgba(138,106,31,0.3);
+  box-shadow:0 4px 20px rgba(0,0,0,0.06);
+}
+.pthumb {
+  width:56px; height:56px; border-radius:10px;
+  overflow:hidden; background:var(--cream);
+  border:1px solid var(--stroke);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.pthumb img { width:100%; height:100%; object-fit:cover; }
+.pthumb svg { color:var(--ghost); }
+
+.pinfo { min-width:0; }
+.pname {
+  font-family:var(--f-display); font-size:0.88rem; font-weight:700;
+  letter-spacing:-0.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  margin-bottom:3px; color:var(--ink);
+}
+.pspecs { font-size:0.74rem; color:var(--ghost); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pmeta { display:flex; align-items:center; gap:8px; margin-top:5px; }
+.pprice {
+  font-family:var(--f-display); font-size:0.9rem; font-weight:700;
+  color:var(--green);
+}
+.pbadge {
+  font-size:0.6rem; font-weight:700; letter-spacing:0.1em;
+  text-transform:uppercase; padding:2px 8px; border-radius:100px;
+}
+.pbadge.cel { background:var(--blue-soft); color:var(--blue); }
+.pbadge.acc { background:var(--green-soft); color:var(--green); }
+.pbadge.tie { background:rgba(138,106,31,0.1); color:var(--gold); }
+
+.pactions { display:flex; flex-direction:column; gap:5px; }
+.ibtn {
+  width:32px; height:32px; border-radius:8px;
+  border:1px solid var(--stroke); background:white;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:all .2s; color:var(--ghost);
+}
+.ibtn:hover { border-color:var(--stroke); color:var(--ink); background:var(--cream); }
+.ibtn.del:hover { border-color:rgba(192,57,43,.3); background:var(--red-soft); color:var(--red); }
+.ibtn.edt:hover { border-color:rgba(138,106,31,.3); background:rgba(138,106,31,0.06); color:var(--gold); }
+
+
+.empty {
+  padding:52px 20px; text-align:center; color:var(--ghost);
+}
+.empty svg { margin-bottom:14px; color:var(--stroke); }
+.empty p { font-size:0.85rem; }
+
+
+.toast {
+  position:fixed; bottom:28px; right:28px; z-index:9000;
+  background:var(--ink); color:white;
+  border-radius:12px; padding:13px 20px;
+  font-size:0.83rem; font-weight:500;
+  display:flex; align-items:center; gap:10px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  transform:translateY(70px); opacity:0;
+  transition:all .4s cubic-bezier(.16,1,.3,1);
+  max-width:290px;
+}
+.toast.show { transform:translateY(0); opacity:1; }
+.toast.ok  { background:#1a5c3a; }
+.toast.err { background:var(--red); }
+.toast svg { flex-shrink:0; }
+
+
+.overlay {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(13,13,13,0.65);
+  backdrop-filter:blur(6px);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity .3s;
+}
+.overlay.on { opacity:1; pointer-events:all; }
+.modal {
+  background:white; border:1px solid var(--stroke);
+  border-radius:22px; padding:36px;
+  width:90%; max-width:420px;
+  transform:scale(.96);
+  transition:transform .3s cubic-bezier(.16,1,.3,1);
+  box-shadow:0 40px 80px rgba(0,0,0,0.15);
+}
+.overlay.on .modal { transform:scale(1); }
+.modal-title {
+  font-family:var(--f-display); font-size:1.2rem; font-weight:800;
+  letter-spacing:-0.03em; margin-bottom:24px;
+}
+.modal-actions { display:flex; gap:10px; margin-top:22px; }
+.btn-cancel {
+  flex:1; padding:13px;
+  background:var(--cream); border:1px solid var(--stroke);
+  border-radius:10px; font-family:var(--f-body);
+  font-size:0.88rem; font-weight:500; color:var(--ghost);
+  cursor:pointer; transition:all .2s;
+}
+.btn-cancel:hover { color:var(--ink); border-color:var(--stroke); background:var(--paper); }
+.btn-save {
+  flex:1; padding:13px;
+  background:var(--ink); border:none;
+  border-radius:10px; color:white;
+  font-family:var(--f-body); font-size:0.88rem; font-weight:600;
+  cursor:pointer; transition:all .2s;
+}
+.btn-save:hover { background:var(--blue); transform:translateY(-1px); }
+
+
+footer {
+  border-top:1px solid var(--stroke);
+  padding:24px 40px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:relative; z-index:1;
+}
+@media(max-width:600px){ footer{flex-direction:column; gap:8px; padding:20px;} }
+.footer-brand {
+  font-family:var(--f-display); font-size:0.85rem; font-weight:700; color:var(--ghost);
+  letter-spacing:-0.02em;
+}
+.footer-meta { font-size:0.7rem; color:var(--ghost); }
+</style>
 </head>
 <body>
 
-    <nav>
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo">TecnoServicios</a>
-            <div class="nav-links">
-                <a href="index.html">Inicio</a>
-                <a href="Tienda.html">Tienda</a>
-                <a href="#" class="active">Admin</a>
-            </div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-wordmark">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      <span class="wordmark-text">TecnoServicios</span>
+    </a>
+    <div class="nav-right">
+      <span class="nav-tag">Panel Privado</span>
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        Conectado
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  
+  <div class="masthead">
+    <div class="masthead-left">
+      <div class="masthead-eyebrow">Control de inventario</div>
+      <h1 class="masthead-title">Gestión de<br><em>Productos</em></h1>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-cell">
+        <div class="stat-num gold" id="statTotal">—</div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" id="statCel">—</div>
+        <div class="stat-label">Celulares</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" id="statAcc">—</div>
+        <div class="stat-label">Accesorios</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num" id="statTienda">—</div>
+        <div class="stat-label">Tienda</div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="workspace">
+
+    
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-heading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Nuevo Producto
         </div>
-    </nav>
+      </div>
+      <div class="panel-body">
 
-    <header class="page-header">
-        <h1>Panel de Administración</h1>
-        <p>Gestiona el inventario. El formulario se adaptará a lo que quieras subir.</p>
-    </header>
+        <div class="progress-wrap" id="pbar"><div class="progress-fill" id="pfill"></div></div>
 
-    <main class="admin-layout">
-        
-        <section class="glass-panel">
-            <div class="panel-title">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Nuevo Producto
+        <form id="productForm">
+          <div class="fg">
+            <label>Sección / Destino</label>
+            <select id="prodCategory" class="fc" required>
+              <option value="" disabled selected>Elige dónde se publicará...</option>
+              <option value="celulares">Celulares</option>
+              <option value="accesorios">Accesorios</option>
+              <option value="tienda">Tienda General</option>
+            </select>
+          </div>
+
+          <div class="fg">
+            <label>Nombre del Producto</label>
+            <input type="text" id="prodName" class="fc" placeholder="Ej: iPhone 15 Pro Max" required>
+          </div>
+
+          <div class="fg">
+            <label>Precio (USD)</label>
+            <input type="number" id="prodPrice" step="0.01" class="fc" placeholder="0.00" required>
+          </div>
+
+          <div class="fg">
+            <label>Fotografía del Producto</label>
+            <div class="file-zone" id="fileZone">
+              <input type="file" id="prodImage" accept="image/*" required>
+              <div class="fz-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="3"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+              </div>
+              <div class="fz-text">Haz clic o arrastra una imagen aquí</div>
+              <div class="fz-name" id="fzName"></div>
             </div>
-            
-            <form id="productForm">
-                <div class="form-group">
-                    <label>Sección / Destino</label>
-                    <select id="prodCategory" class="form-control" required>
-                        <option value="" disabled selected>Elige dónde se publicará...</option>
-                        <option value="celulares">📱 Celulares</option>
-                        <option value="accesorios">🎧 Accesorios</option>
-                        <option value="tienda">🛍️ Tienda General</option>
-                    </select>
-                </div>
+          </div>
 
-                <div class="form-group">
-                    <label>Nombre del Producto</label>
-                    <input type="text" id="prodName" class="form-control" placeholder="Ej: iPhone 15 Pro o Funda de Silicona" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Precio ($)</label>
-                    <input type="number" id="prodPrice" step="0.01" class="form-control" placeholder="Ej: 999.99" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Foto del Producto</label>
-                    <input type="file" id="prodImage" class="form-control" accept="image/*" required>
-                </div>
-
-                <div id="fields-celulares" class="dynamic-section">
-                    <p style="font-size: 0.8rem; color: var(--accent-blue); margin-bottom: 10px; font-weight: bold;">📝 DATOS DEL CELULAR</p>
-                    <div class="form-group">
-                        <label>Almacenamiento / RAM</label>
-                        <input type="text" id="celStorage" class="form-control" placeholder="Ej: 256GB / 8GB RAM">
-                    </div>
-                    <div class="form-group">
-                        <label>Color / Condición</label>
-                        <input type="text" id="celCondition" class="form-control" placeholder="Ej: Negro Titanio, Como Nuevo">
-                    </div>
-                </div>
-
-                <div id="fields-accesorios" class="dynamic-section">
-                    <p style="font-size: 0.8rem; color: var(--accent-blue); margin-bottom: 10px; font-weight: bold;">📝 DATOS DEL ACCESORIO</p>
-                    <div class="form-group">
-                        <label>Tipo / Compatibilidad</label>
-                        <input type="text" id="accType" class="form-control" placeholder="Ej: Para iPhone 13/14">
-                    </div>
-                    <div class="form-group">
-                        <label>Marca</label>
-                        <input type="text" id="accBrand" class="form-control" placeholder="Ej: Apple, Anker, Genérico">
-                    </div>
-                </div>
-
-                <div id="fields-tienda" class="dynamic-section">
-                    <p style="font-size: 0.8rem; color: var(--accent-blue); margin-bottom: 10px; font-weight: bold;">📝 DATOS GENERALES (TIENDA)</p>
-                    <div class="form-group">
-                        <label>Características Principales</label>
-                        <input type="text" id="storeSpecs" class="form-control" placeholder="Ej: Carga Rápida 20W">
-                    </div>
-                    <div class="form-group">
-                        <label>Marca / Info Extra</label>
-                        <input type="text" id="storeBrand" class="form-control" placeholder="Ej: Xiaomi">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit" id="submitBtn">Publicar Producto</button>
-            </form>
-        </section>
-
-        <section class="glass-panel">
-            <div class="panel-title">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                Inventario Actual
+          
+          <div id="fields-celulares" class="dyn">
+            <div class="dyn-tag">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              Datos del Celular
             </div>
-            
-            <div id="inventoryList">
-                <div class="loading">Cargando datos desde Supabase...</div>
+            <div class="fg">
+              <label>Almacenamiento / RAM</label>
+              <input type="text" id="celStorage" class="fc" placeholder="Ej: 256 GB · 8 GB RAM">
             </div>
-        </section>
+            <div class="fg" style="margin-bottom:0">
+              <label>Color / Condición</label>
+              <input type="text" id="celCondition" class="fc" placeholder="Ej: Negro Titanio, Como Nuevo">
+            </div>
+          </div>
 
-    </main>
+          
+          <div id="fields-accesorios" class="dyn">
+            <div class="dyn-tag">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+              Datos del Accesorio
+            </div>
+            <div class="fg">
+              <label>Tipo / Compatibilidad</label>
+              <input type="text" id="accType" class="fc" placeholder="Ej: Para iPhone 13 / 14">
+            </div>
+            <div class="fg" style="margin-bottom:0">
+              <label>Marca</label>
+              <input type="text" id="accBrand" class="fc" placeholder="Ej: Apple, Anker, Genérico">
+            </div>
+          </div>
 
-    <footer>
-        <p>© 2026 TecnoServicios. Uso exclusivo de administración.</p>
-    </footer>
+          
+          <div id="fields-tienda" class="dyn">
+            <div class="dyn-tag">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              Datos de Tienda
+            </div>
+            <div class="fg">
+              <label>Características Principales</label>
+              <input type="text" id="storeSpecs" class="fc" placeholder="Ej: Carga Rápida 20W, USB-C">
+            </div>
+            <div class="fg" style="margin-bottom:0">
+              <label>Marca / Info Extra</label>
+              <input type="text" id="storeBrand" class="fc" placeholder="Ej: Xiaomi, Original">
+            </div>
+          </div>
 
-    <script type="module">
-        // Importación del SDK oficial de Supabase
-        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+          <button type="submit" class="btn-publish" id="submitBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Publicar Producto
+          </button>
+        </form>
+      </div>
+    </div>
 
-        // --- CREDENCIALES ---
-        const IMGBB_API_KEY = "1ed7e39db250edeafd135f8a5cdc053f";
-        const SUPABASE_URL = "https://twkljhefqvlqvivgjzib.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_hP7_pGMm0-1q_LzQ_SXeWg_9_H-Odkg";
+    
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-heading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+          Inventario
+          <span class="count-chip" id="countChip">0</span>
+        </div>
+      </div>
 
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      <div class="inv-controls">
+        <div class="search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" class="search-in" placeholder="Buscar por nombre, specs...">
+        </div>
+        <button class="flt on" data-f="all">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+          Todos
+        </button>
+        <button class="flt" data-f="celulares">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
+          Celulares
+        </button>
+        <button class="flt" data-f="accesorios">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/></svg>
+          Accesorios
+        </button>
+        <button class="flt" data-f="tienda">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/></svg>
+          Tienda
+        </button>
+      </div>
 
-        // Referencias del DOM
-        const form = document.getElementById('productForm');
-        const selectCategory = document.getElementById('prodCategory');
-        const inventoryList = document.getElementById('inventoryList');
-        const submitBtn = document.getElementById('submitBtn');
+      <div class="inv-list" id="inventoryList">
+        <div class="empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p>Cargando inventario desde Supabase...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        // Secciones Dinámicas
-        const sectionCelulares = document.getElementById('fields-celulares');
-        const sectionAccesorios = document.getElementById('fields-accesorios');
-        const sectionTienda = document.getElementById('fields-tienda');
+<footer>
+  <span class="footer-brand">TecnoServicios</span>
+  <span class="footer-meta">Panel de administración · Uso privado</span>
+</footer>
 
-        // --- 1. LÓGICA DEL FORMULARIO DINÁMICO ---
-        selectCategory.addEventListener('change', (e) => {
-            const val = e.target.value;
-            
-            // Ocultar todos primero y quitar el requerido
-            [sectionCelulares, sectionAccesorios, sectionTienda].forEach(sec => {
-                sec.classList.remove('active');
-                sec.querySelectorAll('input').forEach(input => input.required = false);
-            });
 
-            // Mostrar la categoría elegida
-            if (val === 'celulares') {
-                sectionCelulares.classList.add('active');
-                document.getElementById('celStorage').required = true;
-                document.getElementById('celCondition').required = true;
-            } else if (val === 'accesorios') {
-                sectionAccesorios.classList.add('active');
-                document.getElementById('accType').required = true;
-                document.getElementById('accBrand').required = true;
-            } else if (val === 'tienda') {
-                sectionTienda.classList.add('active');
-                document.getElementById('storeSpecs').required = true;
-                document.getElementById('storeBrand').required = true;
-            }
-        });
+<div class="toast" id="toast">
+  <svg id="toastIcon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></svg>
+  <span id="toastMsg"></span>
+</div>
 
-        // --- 2. LEER INVENTARIO ACTUAL DESDE SUPABASE ---
-        async function loadInventory() {
-            inventoryList.innerHTML = '<div class="loading" style="text-align:center; padding: 20px;">Cargando inventario...</div>';
-            
-            const { data: productos, error } = await supabase
-                .from('productos')
-                .select('*')
-                .order('id', { ascending: false });
 
-            if (error) {
-                console.error("Error al cargar el inventario:", error);
-                inventoryList.innerHTML = '<div class="loading" style="color:var(--danger); text-align:center;">Error al cargar datos. Revisa la consola.</div>';
-                return;
-            }
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <div class="modal-title">Editar Producto</div>
+    <input type="hidden" id="editId">
+    <div class="fg">
+      <label>Nombre</label>
+      <input type="text" id="editName" class="fc">
+    </div>
+    <div class="fg">
+      <label>Precio (USD)</label>
+      <input type="number" id="editPrice" step="0.01" class="fc">
+    </div>
+    <div class="fg" style="margin-bottom:0">
+      <label>Especificaciones</label>
+      <input type="text" id="editSpecs" class="fc">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancelEdit">Cancelar</button>
+      <button class="btn-save" id="saveEdit">Guardar cambios</button>
+    </div>
+  </div>
+</div>
 
-            inventoryList.innerHTML = ''; 
-            
-            if (!productos || productos.length === 0) {
-                inventoryList.innerHTML = '<div class="loading" style="text-align:center; padding: 20px; color:var(--text-muted);">No hay productos registrados en la base de datos.</div>';
-                return;
-            }
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-            productos.forEach((product) => {
-                let previewSpecs = product.especificaciones ? product.especificaciones.replace(',', ' • ') : '';
+const IMGBB_KEY  = "1ed7e39db250edeafd135f8a5cdc053f";
+const SB_URL     = "https://twkljhefqvlqvivgjzib.supabase.co";
+const SB_KEY     = "sb_publishable_hP7_pGMm0-1q_LzQ_SXeWg_9_H-Odkg";
+const supabase   = createClient(SB_URL, SB_KEY);
 
-                const div = document.createElement('div');
-                div.className = 'product-list-item';
-                div.innerHTML = `
-                    <div class="item-info">
-                        <h4>${product.nombre}</h4>
-                        <p>$${Number(product.precio).toFixed(2)} - ${previewSpecs}</p>
-                        <span class="item-badge">${product.categoria.toUpperCase()}</span>
-                    </div>
-                    <button class="btn-delete" data-id="${product.id}" title="Borrar">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    </button>
-                `;
-                inventoryList.appendChild(div);
-            });
+let all = [], filter = 'all', search = '';
 
-            // Lógica de borrar producto conectada a Supabase
-            document.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const idToDelete = e.currentTarget.getAttribute('data-id');
-                    if(confirm('¿Estás seguro de que deseas eliminar este producto permanentemente de la tienda?')) {
-                        const { error } = await supabase
-                            .from('productos')
-                            .delete()
-                            .eq('id', idToDelete);
-                            
-                        if (!error) {
-                            loadInventory(); // Recargar tras el borrado
-                        } else {
-                            console.error("Error eliminando producto:", error);
-                            alert("No se pudo eliminar. Revisa la consola.");
-                        }
-                    }
-                });
-            });
-        }
 
-        // Cargar datos al iniciar la página
-        loadInventory();
+const ICONS = {
+  ok:  '<polyline points="20 6 9 17 4 12"/>',
+  err: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'
+};
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastIcon').innerHTML = ICONS[type];
+  el.className = `toast show ${type}`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3600);
+}
 
-        // --- 3. GUARDAR PRODUCTO EN IMGBB + SUPABASE ---
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const categoriaSel = selectCategory.value;
-            const fileInput = document.getElementById('prodImage');
-            
-            if (!fileInput.files.length) {
-                alert("Por favor selecciona una imagen para subir.");
-                return;
-            }
 
-            // Cambiar estado visual del botón
-            submitBtn.textContent = "Subiendo imagen a ImgBB...";
-            submitBtn.style.opacity = "0.7";
+function prog(n) {
+  const w = document.getElementById('pbar');
+  const f = document.getElementById('pfill');
+  if (!n) { w.classList.remove('on'); f.style.width='0%'; return; }
+  w.classList.add('on'); f.style.width = n+'%';
+}
 
-            let stringEspecificaciones = "";
-            if (categoriaSel === 'celulares') {
-                stringEspecificaciones = `${document.getElementById('celStorage').value},${document.getElementById('celCondition').value}`;
-            } else if (categoriaSel === 'accesorios') {
-                stringEspecificaciones = `${document.getElementById('accType').value},${document.getElementById('accBrand').value}`;
-            } else if (categoriaSel === 'tienda') {
-                stringEspecificaciones = `${document.getElementById('storeSpecs').value},${document.getElementById('storeBrand').value}`;
-            }
 
-            try {
-                // Paso A: Subir imagen a ImgBB
-                const formData = new FormData();
-                formData.append("image", fileInput.files[0]);
+const fi = document.getElementById('prodImage');
+const fz = document.getElementById('fileZone');
+const fn = document.getElementById('fzName');
+fi.addEventListener('change', () => {
+  if(fi.files.length){ fn.textContent = fi.files[0].name; fz.classList.add('filled'); }
+});
 
-                const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: "POST",
-                    body: formData
-                });
-                const imgbbData = await imgbbResponse.json();
 
-                if (!imgbbData.success) {
-                    throw new Error(imgbbData.error ? imgbbData.error.message : "Error al subir a ImgBB");
-                }
-                const finalImageUrl = imgbbData.data.url;
+const cat$ = document.getElementById('prodCategory');
+const dyns = { celulares: document.getElementById('fields-celulares'), accesorios: document.getElementById('fields-accesorios'), tienda: document.getElementById('fields-tienda') };
+cat$.addEventListener('change', e => {
+  Object.values(dyns).forEach(d => { d.classList.remove('on'); d.querySelectorAll('input').forEach(i => i.required=false); });
+  const v = e.target.value;
+  if(dyns[v]){ dyns[v].classList.add('on'); dyns[v].querySelectorAll('input').forEach(i => i.required=true); }
+});
 
-                // Paso B: Guardar datos en Supabase
-                submitBtn.textContent = "Guardando en Supabase...";
 
-                const { error } = await supabase.from('productos').insert([{
-                    nombre: document.getElementById('prodName').value,
-                    categoria: categoriaSel,
-                    precio: parseFloat(document.getElementById('prodPrice').value),
-                    especificaciones: stringEspecificaciones,
-                    imagenUrl: finalImageUrl
-                }]);
+async function load() {
+  const { data, error } = await supabase.from('productos').select('*').order('id', { ascending:false });
+  if(error){ toast('Error al cargar inventario','err'); return; }
+  all = data || [];
+  stats(); render();
+}
 
-                if (error) throw error;
+function stats() {
+  document.getElementById('statTotal').textContent  = all.length;
+  document.getElementById('statCel').textContent    = all.filter(p=>p.categoria==='celulares').length;
+  document.getElementById('statAcc').textContent    = all.filter(p=>p.categoria==='accesorios').length;
+  document.getElementById('statTienda').textContent = all.filter(p=>p.categoria==='tienda').length;
+}
 
-                // Paso C: Limpiar formulario y notificar éxito
-                form.reset();
-                [sectionCelulares, sectionAccesorios, sectionTienda].forEach(sec => sec.classList.remove('active'));
-                
-                alert(`¡Producto registrado exitosamente en la categoría ${categoriaSel.toUpperCase()}!`);
-                loadInventory(); // Refrescar lista de inventario
-                
-            } catch (error) {
-                console.error("Error en el proceso de guardado:", error);
-                alert("Ocurrió un error al subir el producto. Revisa la consola para más detalles.");
-            } finally {
-                submitBtn.textContent = "Publicar Producto";
-                submitBtn.style.opacity = "1";
-            }
-        });
-    </script>
+function render() {
+  const list = document.getElementById('inventoryList');
+  let rows = all;
+  if(filter !== 'all') rows = rows.filter(p=>p.categoria===filter);
+  if(search.trim()) { const q=search.toLowerCase(); rows=rows.filter(p=>p.nombre.toLowerCase().includes(q)||(p.especificaciones||'').toLowerCase().includes(q)); }
+
+  const chip = document.getElementById('countChip');
+  chip.textContent = rows.length;
+  chip.className = 'count-chip' + (rows.length ? ' filled':'');
+
+  if(!rows.length){
+    list.innerHTML = `<div class="empty">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p>${search ? 'Sin resultados para "'+search+'"' : 'No hay productos en esta categoría'}</p></div>`;
+    return;
+  }
+
+  list.innerHTML='';
+  rows.forEach((p,i)=>{
+    const specs = (p.especificaciones||'').replace(',', ' · ');
+    const bc = p.categoria==='celulares'?'cel': p.categoria==='accesorios'?'acc':'tie';
+    const card = document.createElement('div');
+    card.className='pcard';
+    card.style.animationDelay = (i*30)+'ms';
+    card.innerHTML=`
+      <div class="pthumb">
+        ${p.imagenUrl
+          ? `<img src="${p.imagenUrl}" alt="${p.nombre}">`
+          : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`}
+      </div>
+      <div class="pinfo">
+        <div class="pname">${p.nombre}</div>
+        <div class="pspecs">${specs||'—'}</div>
+        <div class="pmeta">
+          <span class="pprice">$${Number(p.precio).toFixed(2)}</span>
+          <span class="pbadge ${bc}">${p.categoria}</span>
+        </div>
+      </div>
+      <div class="pactions">
+        <button class="ibtn edt" title="Editar"
+          data-id="${p.id}" data-name="${p.nombre}" data-price="${p.precio}" data-specs="${p.especificaciones||''}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="ibtn del" title="Eliminar" data-id="${p.id}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>`;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll('.ibtn.del').forEach(b => b.addEventListener('click', async()=>{
+    if(!confirm('¿Eliminar este producto permanentemente?')) return;
+    const {error} = await supabase.from('productos').delete().eq('id', b.dataset.id);
+    if(!error){ toast('Producto eliminado'); load(); } else toast('Error al eliminar','err');
+  }));
+
+  list.querySelectorAll('.ibtn.edt').forEach(b => b.addEventListener('click', ()=>{
+    document.getElementById('editId').value    = b.dataset.id;
+    document.getElementById('editName').value  = b.dataset.name;
+    document.getElementById('editPrice').value = b.dataset.price;
+    document.getElementById('editSpecs').value = b.dataset.specs;
+    document.getElementById('editOverlay').classList.add('on');
+  }));
+}
+
+
+document.getElementById('searchInput').addEventListener('input', e=>{ search=e.target.value; render(); });
+document.querySelectorAll('.flt').forEach(b => b.addEventListener('click', ()=>{
+  document.querySelectorAll('.flt').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); filter=b.dataset.f; render();
+}));
+
+
+document.getElementById('productForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const btn  = document.getElementById('submitBtn');
+  const cat  = cat$.value;
+  const file = fi.files[0];
+  if(!file){ toast('Selecciona una imagen','err'); return; }
+
+  btn.disabled=true;
+  btn.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.18-4.55"/></svg> Subiendo imagen...`;
+  prog(30);
+
+  let specs='';
+  if(cat==='celulares')  specs=`${document.getElementById('celStorage').value},${document.getElementById('celCondition').value}`;
+  if(cat==='accesorios') specs=`${document.getElementById('accType').value},${document.getElementById('accBrand').value}`;
+  if(cat==='tienda')     specs=`${document.getElementById('storeSpecs').value},${document.getElementById('storeBrand').value}`;
+
+  try {
+    const fd=new FormData(); fd.append('image',file);
+    const r = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`,{method:'POST',body:fd});
+    const d = await r.json();
+    if(!d.success) throw new Error('Error ImgBB: '+(d.error?.message||'desconocido'));
+
+    prog(70);
+    btn.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.18-4.55"/></svg> Guardando...`;
+
+    const {error} = await supabase.from('productos').insert([{
+      nombre: document.getElementById('prodName').value,
+      categoria: cat,
+      precio: parseFloat(document.getElementById('prodPrice').value),
+      especificaciones: specs,
+      imagenUrl: d.data.url
+    }]);
+    if(error) throw error;
+
+    prog(100); setTimeout(()=>prog(0),600);
+    e.target.reset();
+    fn.textContent=''; fz.classList.remove('filled');
+    Object.values(dyns).forEach(s=>s.classList.remove('on'));
+    toast('Producto publicado correctamente');
+    load();
+  } catch(err){
+    console.error(err);
+    toast('Error: '+err.message, 'err');
+    prog(0);
+  } finally {
+    btn.disabled=false;
+    btn.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Publicar Producto`;
+  }
+});
+
+
+document.getElementById('cancelEdit').addEventListener('click',()=> document.getElementById('editOverlay').classList.remove('on'));
+document.getElementById('editOverlay').addEventListener('click', e=>{ if(e.target===document.getElementById('editOverlay')) document.getElementById('editOverlay').classList.remove('on'); });
+document.getElementById('saveEdit').addEventListener('click', async()=>{
+  const id    = document.getElementById('editId').value;
+  const nombre= document.getElementById('editName').value;
+  const precio= parseFloat(document.getElementById('editPrice').value);
+  const especificaciones = document.getElementById('editSpecs').value;
+  const {error} = await supabase.from('productos').update({nombre,precio,especificaciones}).eq('id',id);
+  if(!error){ document.getElementById('editOverlay').classList.remove('on'); toast('Producto actualizado'); load(); }
+  else toast('Error al guardar','err');
+});
+
+load();
+</script>
 </body>
 </html>

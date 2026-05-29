@@ -245,7 +245,7 @@
             </div>
             
             <div id="inventoryList">
-                <div class="loading">Cargando datos desde Firebase...</div>
+                <div class="loading">Cargando datos desde Supabase...</div>
             </div>
         </section>
 
@@ -256,24 +256,15 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // Importación del SDK oficial de Supabase
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDrFD8i1-KJTGPWCNfJZEYCUyW6S0Cpou0",
-            authDomain: "tecnoservicios-c865f.firebaseapp.com",
-            projectId: "tecnoservicios-c865f",
-            storageBucket: "tecnoservicios-c865f.firebasestorage.app",
-            messagingSenderId: "100191806419",
-            appId: "1:100191806419:web:5c72faacd04364150e4526"
-        };
+        // --- CREDENCIALES ---
+        const IMGBB_API_KEY = "1ed7e39db250edeafd135f8a5cdc053f";
+        const SUPABASE_URL = "https://twkljhefqvlqvivgjzib.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_hP7_pGMm0-1q_LzQ_SXeWg_9_H-Odkg";
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // --- CONFIGURACIÓN DE IMGBB ---
-        // REEMPLAZA ESTO con tu API Key real de ImgBB (Consíguela gratis en https://api.imgbb.com/)
-        const IMGBB_API_KEY = "TU_API_KEY_DE_IMGBB"; 
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Referencias del DOM
         const form = document.getElementById('productForm');
@@ -290,13 +281,13 @@
         selectCategory.addEventListener('change', (e) => {
             const val = e.target.value;
             
-            // Ocultar todos primero y quitarles el "required" a sus inputs
+            // Ocultar todos primero y quitar el requerido
             [sectionCelulares, sectionAccesorios, sectionTienda].forEach(sec => {
                 sec.classList.remove('active');
                 sec.querySelectorAll('input').forEach(input => input.required = false);
             });
 
-            // Mostrar solo el seleccionado y hacer sus inputs obligatorios
+            // Mostrar la categoría elegida
             if (val === 'celulares') {
                 sectionCelulares.classList.add('active');
                 document.getElementById('celStorage').required = true;
@@ -312,97 +303,30 @@
             }
         });
 
-        // --- 2. LÓGICA PARA GUARDAR EN FIREBASE CON SUBIDA A IMGBB ---
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // --- 2. LEER INVENTARIO ACTUAL DESDE SUPABASE ---
+        async function loadInventory() {
+            inventoryList.innerHTML = '<div class="loading" style="text-align:center; padding: 20px;">Cargando inventario...</div>';
             
-            const categoriaSel = selectCategory.value;
-            if(!categoriaSel) {
-                alert("Por favor, selecciona una categoría primero.");
+            const { data: productos, error } = await supabase
+                .from('productos')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (error) {
+                console.error("Error al cargar el inventario:", error);
+                inventoryList.innerHTML = '<div class="loading" style="color:var(--danger); text-align:center;">Error al cargar datos. Revisa la consola.</div>';
                 return;
             }
 
-            const fileInput = document.getElementById('prodImage');
-            if (fileInput.files.length === 0) {
-                alert("Por favor, selecciona una imagen para el producto.");
-                return;
-            }
-
-            // Cambiar estado del botón para dar feedback visual fluido
-            submitBtn.textContent = "Subiendo imagen...";
-            submitBtn.style.opacity = "0.7";
-
-            let stringEspecificaciones = "";
-
-            if (categoriaSel === 'celulares') {
-                stringEspecificaciones = `${document.getElementById('celStorage').value},${document.getElementById('celCondition').value}`;
-            } else if (categoriaSel === 'accesorios') {
-                stringEspecificaciones = `${document.getElementById('accType').value},${document.getElementById('accBrand').value}`;
-            } else if (categoriaSel === 'tienda') {
-                stringEspecificaciones = `${document.getElementById('storeSpecs').value},${document.getElementById('storeBrand').value}`;
-            }
-
-            try {
-                // 1. Preparar la imagen para ImgBB usando FormData
-                const imageFile = fileInput.files[0];
-                const formData = new FormData();
-                formData.append("image", imageFile);
-
-                // 2. Hacer la petición a la API de ImgBB
-                const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: "POST",
-                    body: formData
-                });
-
-                const imgbbData = await imgbbResponse.json();
-
-                if (!imgbbData.success) {
-                    throw new Error(imgbbData.error ? imgbbData.error.message : "Error al subir a ImgBB");
-                }
-
-                // Aquí obtenemos la URL directa final
-                const finalImageUrl = imgbbData.data.url;
-
-                submitBtn.textContent = "Publicando producto...";
-
-                // 3. Guardar todo en Firestore con la URL real de la imagen
-                await addDoc(collection(db, "productos"), {
-                    nombre: document.getElementById('prodName').value,
-                    categoria: categoriaSel,
-                    precio: parseFloat(document.getElementById('prodPrice').value),
-                    especificaciones: stringEspecificaciones, 
-                    imagenUrl: finalImageUrl, // El enlace directo listo para usar
-                    fechaRegistro: new Date()
-                });
-
-                form.reset();
-                // Reiniciar las secciones ocultas
-                [sectionCelulares, sectionAccesorios, sectionTienda].forEach(sec => sec.classList.remove('active'));
-                alert(`¡Producto subido con éxito a la sección ${categoriaSel.toUpperCase()}!`);
-                
-            } catch (error) {
-                console.error("Hubo un problema en el proceso: ", error);
-                alert("Hubo un error al procesar la imagen o al guardar. Revisa la consola.");
-            } finally {
-                submitBtn.textContent = "Publicar Producto";
-                submitBtn.style.opacity = "1";
-            }
-        });
-
-        // --- 3. LEER INVENTARIO ACTUAL ---
-        onSnapshot(collection(db, "productos"), (snapshot) => {
             inventoryList.innerHTML = ''; 
             
-            if (snapshot.empty) {
-                inventoryList.innerHTML = '<div class="loading">No hay productos en inventario.</div>';
+            if (!productos || productos.length === 0) {
+                inventoryList.innerHTML = '<div class="loading" style="text-align:center; padding: 20px; color:var(--text-muted);">No hay productos registrados en la base de datos.</div>';
                 return;
             }
 
-            snapshot.forEach((docSnap) => {
-                const product = docSnap.data();
-                const id = docSnap.id;
-                
-                let previewSpecs = product.especificaciones.replace(',', ' • ');
+            productos.forEach((product) => {
+                let previewSpecs = product.especificaciones ? product.especificaciones.replace(',', ' • ') : '';
 
                 const div = document.createElement('div');
                 div.className = 'product-list-item';
@@ -412,25 +336,106 @@
                         <p>$${Number(product.precio).toFixed(2)} - ${previewSpecs}</p>
                         <span class="item-badge">${product.categoria.toUpperCase()}</span>
                     </div>
-                    <button class="btn-delete" data-id="${id}" title="Borrar">
+                    <button class="btn-delete" data-id="${product.id}" title="Borrar">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
                 `;
                 inventoryList.appendChild(div);
             });
 
-            // Lógica de borrar
-            const deleteButtons = document.querySelectorAll('.btn-delete');
-            deleteButtons.forEach(btn => {
+            // Lógica de borrar producto conectada a Supabase
+            document.querySelectorAll('.btn-delete').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const idToDelete = e.currentTarget.getAttribute('data-id');
-                    if(confirm('¿Estás seguro de que deseas eliminar este producto de la tienda?')) {
-                        await deleteDoc(doc(db, "productos", idToDelete));
+                    if(confirm('¿Estás seguro de que deseas eliminar este producto permanentemente de la tienda?')) {
+                        const { error } = await supabase
+                            .from('productos')
+                            .delete()
+                            .eq('id', idToDelete);
+                            
+                        if (!error) {
+                            loadInventory(); // Recargar tras el borrado
+                        } else {
+                            console.error("Error eliminando producto:", error);
+                            alert("No se pudo eliminar. Revisa la consola.");
+                        }
                     }
                 });
             });
-        });
+        }
 
+        // Cargar datos al iniciar la página
+        loadInventory();
+
+        // --- 3. GUARDAR PRODUCTO EN IMGBB + SUPABASE ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const categoriaSel = selectCategory.value;
+            const fileInput = document.getElementById('prodImage');
+            
+            if (!fileInput.files.length) {
+                alert("Por favor selecciona una imagen para subir.");
+                return;
+            }
+
+            // Cambiar estado visual del botón
+            submitBtn.textContent = "Subiendo imagen a ImgBB...";
+            submitBtn.style.opacity = "0.7";
+
+            let stringEspecificaciones = "";
+            if (categoriaSel === 'celulares') {
+                stringEspecificaciones = `${document.getElementById('celStorage').value},${document.getElementById('celCondition').value}`;
+            } else if (categoriaSel === 'accesorios') {
+                stringEspecificaciones = `${document.getElementById('accType').value},${document.getElementById('accBrand').value}`;
+            } else if (categoriaSel === 'tienda') {
+                stringEspecificaciones = `${document.getElementById('storeSpecs').value},${document.getElementById('storeBrand').value}`;
+            }
+
+            try {
+                // Paso A: Subir imagen a ImgBB
+                const formData = new FormData();
+                formData.append("image", fileInput.files[0]);
+
+                const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: "POST",
+                    body: formData
+                });
+                const imgbbData = await imgbbResponse.json();
+
+                if (!imgbbData.success) {
+                    throw new Error(imgbbData.error ? imgbbData.error.message : "Error al subir a ImgBB");
+                }
+                const finalImageUrl = imgbbData.data.url;
+
+                // Paso B: Guardar datos en Supabase
+                submitBtn.textContent = "Guardando en Supabase...";
+
+                const { error } = await supabase.from('productos').insert([{
+                    nombre: document.getElementById('prodName').value,
+                    categoria: categoriaSel,
+                    precio: parseFloat(document.getElementById('prodPrice').value),
+                    especificaciones: stringEspecificaciones,
+                    imagenUrl: finalImageUrl
+                }]);
+
+                if (error) throw error;
+
+                // Paso C: Limpiar formulario y notificar éxito
+                form.reset();
+                [sectionCelulares, sectionAccesorios, sectionTienda].forEach(sec => sec.classList.remove('active'));
+                
+                alert(`¡Producto registrado exitosamente en la categoría ${categoriaSel.toUpperCase()}!`);
+                loadInventory(); // Refrescar lista de inventario
+                
+            } catch (error) {
+                console.error("Error en el proceso de guardado:", error);
+                alert("Ocurrió un error al subir el producto. Revisa la consola para más detalles.");
+            } finally {
+                submitBtn.textContent = "Publicar Producto";
+                submitBtn.style.opacity = "1";
+            }
+        });
     </script>
 </body>
 </html>
